@@ -4,14 +4,12 @@ using namespace std;
 const int SIZE = 10;
 
 void bubbleSort(int[]);
-void selectionSort(int[]);
+void insertionSort(int[]);
 void printArray(int[]);
 
 int main()
 {
-    int arr[SIZE] = {5,2,6,9,19,4,1,29,10,3};
-    //int arr[SIZE] = {5,2,3};
-
+    int arr[SIZE] = {5,2,6,9,7,4,1,8,10,3};
 
     cout << "OG array: " << endl;
     printArray(arr);
@@ -21,10 +19,11 @@ int main()
     bubbleSort(arr);
     printArray(arr);
 
-    cout << "====Selection Sort====" << endl;
+    cout << "====Insertion Sort====" << endl;
 
-    int second_arr[SIZE] = {5,2,6,9,19,4,1,29,10,3};
-    selectionSort(second_arr);
+    int second_arr[SIZE] = {5,2,6,9,7,4,1,8,10,3};
+
+    insertionSort(second_arr);
     printArray(second_arr);
 
     return 0;
@@ -32,48 +31,42 @@ int main()
 
 void bubbleSort(int arr[])
 {
-    int tmp = 0;
-    bool swap = true;
+    int i,j,tmp = 0;
 
-    for (int i=0; (i<SIZE) && swap; i++)
+    for (i = 0; (i < SIZE); i++)
     {
-	swap = false;
-
-	for (int j=0; j<SIZE-1; j++)
-	{
-	    if (arr[j] > arr[j+1])
-	    {
-		tmp = arr[j];
-		arr[j] = arr[j+1];
-		arr[j+1] = tmp;
-		swap = true;
-	    }
-	}
+    	for (j = SIZE-1; j >= i+1; j--)
+    	{
+    	    if (arr[j] < arr[j-1])
+    	    {
+                tmp = arr[j];
+                arr[j] = arr[j-1];
+                arr[j-1] = tmp;
+    	    }
+    	}
     }
 }
 
-void selectionSort(int arr[])
+void insertionSort(int arr[])
 {
-    int tmp = 0;
-    int min_index = 0;
+    int i,j,key = 0;
 
-    for (int i=0; i<SIZE-1; i++)
+    for (j=1; j<SIZE; j++)
     {
-        min_index = i;
+        key = arr[j];
+        i = j - 1;
+        
+        // roll through sorted list
+        while (arr[i] > key && i >= 0)
+        {
+            arr[i+1] = arr[i];
+            i--;
+        }
 
-        for (int j=i+1; j<SIZE; j++)
-	{
-	    if (arr[j] < arr[min_index])
-		min_index = j;
-	}
-
-	tmp = arr[i];
-	arr[i] = arr[min_index];
-    	arr[min_index] = tmp;
+        // Insert key into sorted list
+        arr[i+1] = key;
     }
 }
-
-
 
 void printArray(int arr[])
 {
