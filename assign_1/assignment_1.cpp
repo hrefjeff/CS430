@@ -33,7 +33,7 @@ void bubbleSort(int arr[])
 {
     int i,j,tmp = 0;
 
-    for (i = 0; (i < SIZE); i++)
+    for (i = 0; i < SIZE; i++)
     {
     	for (j = SIZE-1; j >= i+1; j--)
     	{
@@ -57,7 +57,7 @@ void insertionSort(int arr[])
         i = j - 1;
         
         // roll through sorted list
-        while (arr[i] > key && i >= 0)
+        while (i >= 0 && arr[i] > key)
         {
             arr[i+1] = arr[i];
             i--;
