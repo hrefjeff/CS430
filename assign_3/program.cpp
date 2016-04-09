@@ -1,4 +1,9 @@
 #include <iostream>
+#include <queue>
+#include <string>
+#include <fstream>
+#include <map>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -6,99 +11,253 @@ struct item
 {
     int weight;
     int value;
+    bool operator<(const item& rhs) const
+    {
+        return weight > rhs.weight;
+    }
 };
 
-vector<item> inventory;
-vector<item> bag;
+unordered_map<int,int> solution_map;
 
+
+void readFile(string filename, priority_queue<item>& container, int & num_of_items, int & container_capacity);
 
 void print_item(item);
-void print_contents_of(vector<item> container);
-void insert_item_into(vector<item>& container, int weight, int value);
-void transfer_from_to(vector<item>& from_cont, vector<item>& to_cont);
-//vector<item> optimize(vector<item>& container, int max_weight, int current_value);
+void print_contents_of(priority_queue<item>);
+void insert_item_into(priority_queue<item>&, int, int);
+void transfer_from_to(priority_queue<item>&, priority_queue<item>&);
+int optimize(int, priority_queue<item>&);
+//void optimize(int, int, priority_queue<item>&,priority_queue<item>&);
 
 int main()
 {
 
-    const int num_of_items = 3;
-    const int max_weight = 50;
+    priority_queue<item> inventory;
+    priority_queue<item> bag;
+    int num_of_items;
+    int max_weight;
 
-    // vector<int> columns(num_of_items, 0);
-    // vector<vector<int> > rows(3,num_of_items);
+    //=============Begin File Read Stuff=====================
+    fstream file;
+    string filename;
+    bool badFile = true;
 
-    // for(int i=0;i<rows.size(); i++)
-    // {
-    //     for (int j=0;j<rows[i].size(); j++)
-    //     {
-    //         cout << rows[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // transfer_from_to(inventory,bag);
+    do {
 
-    // print_contents_of(inventory);
-    // print_contents_of(bag);
+        cout << "Input file name: ";
+        //cin >> filename;
+        filename = "input.txt";
+        
+        file.open(filename);
+        badFile = file.fail();
+        file.close();
 
-    insert_item_into(inventory,1,60);
-    insert_item_into(inventory,2,100);
-    insert_item_into(inventory,3,120);
+    } while (badFile);
 
-//    bag = optimize(inventory,50);
-    
+    readFile(filename,inventory,num_of_items,max_weight);
+    //=============End File Read Stuff=======================
+
+    cout << endl;
+
     print_contents_of(inventory);
-    print_contents_of(bag);
+
+
+    int result = optimize(max_weight,inventory);
+
+
+    cout << "Number of Items : " << num_of_items << endl;
+    cout << "Bag Capacity    : " << max_weight << endl;
+    cout << "Max value      : " << result << endl;
+
+
+
+    // for (int i = 0; i < result.size(); i++)
+    //     cout << "Max revenue at weight: " << i << " is " << result[i] << " " << endl;
+
+
+    //optimize(max_weight, current_val, inventory, bag);
+
+    
+    //print_contents_of(bag);
 
     return 0;
 }
+
 
 void print_item(item x)
 {
     cout << "(W: " << x.weight << ", V: " << x.value << ")" << endl;
 }
 
-void print_contents_of(vector<item> container)
+void print_contents_of(priority_queue<item> container)
 {
-    for (int i = 0; i < container.size(); i++)
+    while (!container.empty())
     {
-        print_item(container[i]);
+        cout 
+            << "(W: " 
+                << container.top().weight
+            << ", V: " 
+                << container.top().value
+            << ")" << endl;
+        container.pop();
     }
 }
 
-void insert_item_into(vector<item>& container, int weight, int value)
+void insert_item_into(priority_queue<item>& container, int weight, int value)
 {
-    container.push_back(item());
-    container[container.size() - 1].weight = weight;
-    container[container.size() - 1].value = value;
+    item tmp = item();
+    tmp.weight = weight;
+    tmp.value = value;
+    container.push(tmp);
 }
 
-void transfer_from_to(vector<item>& from_cont, vector<item>& to_cont)
+void transfer_from_to(priority_queue<item>& from_cont, priority_queue<item>& to_cont)
 {
-    item temp = from_cont[0];
-    from_cont.erase(from_cont.begin());
-    to_cont.push_back(temp);
+    to_cont.push(from_cont.top());
+    from_cont.pop();
 }
 
-// pg 369 for algorithm,
+// BOTTOM_UP_CUT_ROD(p,n), where p is price table and n is max size pg 366
+// let r[0...n] be a new array        result array for saving subprobs
+// r[0] = 0
+// for j = 1 to n
+//     q = -inf
+//     for i = 1 to j
+//         q = max(q, p[i] + r[j-i])
+//     r[j] = q
+// return r[n]
+
+
+// pg 369 for algorithm
+// records value AND choices that led to it
+// let r[0...n] and s[0...n] be new arrays
+// EXTENDED_BOTTOM_UP_CUT_ROD(p,n), where p is price table, and a rod size n
+// r[0] = 0
+// for j = 1 to n                       for each rod size
+//     q = -inf                         compute revenue and size of first cut
+//     for i = 1 to j
+//         if q < p[i] + r[j - i]
+//             q = p[i] + r[j-1]
+//             s[j] = i
+//      r[j] = q
+// return r and s
+
+
 // show it has 2 properties: pg 424 & 425
-
-// vector<item> optimize(vector<item>& container, int max_weight, int current_value)
-// {
-//     // choose item i from container
-
-//     // subtract i weight from max
-
-//     // add value i to current value
-
-//     // remove i from container
-
-//     // vector<item> bag = optimize(container, max_weight, current_value)
-
-
-//     // compare bag to solution w/o item i
-// }
-
-// vector<item> find_max_value_for_weight(vector<item>& inventory, int max_weight, int num_of_items)
-// {
+// shoud take in inventory table, and capacity
+int optimize(int max_weight, priority_queue<item>& container)
+{
+    vector<int> result_array;
+    result_array.resize(max_weight);
+    int bag_weight = 0;
+    int bag_val = 0;
     
-// }
+    result_array[0] = 0;    // 0 weight gets 0 dollars
+
+    // in order of increasing weight
+    // for each weight compute max revenue
+    // then save to resultant array
+    for (int curr_weight = 1; curr_weight < max_weight; curr_weight++)
+    {               
+        bag_val = 0;
+
+        for (int i = 1; i < curr_weight; i++)
+        {
+            if ((bag_weight + container.top().weight) < i)
+            {
+                // take max
+                // if current bag val is less,
+                // add container[i] + result_array[curr_weight-i]
+                if (bag_val < (container.top().value + result_array[curr_weight - i]))
+                {
+                    
+                    cout << endl;
+                    cout << "(W: " << container.top().weight << ", V: " << container.top().value << ")" << endl;
+                    cout << endl;
+
+                    bag_val = container.top().value + result_array[curr_weight - i];
+                    bag_weight += container.top().weight;
+                    container.pop();
+                } 
+                else 
+                {
+                    bag_val = result_array[curr_weight - i];
+                }
+            }
+           
+        }
+
+        result_array[curr_weight] = bag_val;
+
+        cout << "Weight " << curr_weight << " value:" << result_array[curr_weight] << endl;
+    }
+
+        
+
+    return result_array[max_weight-1];
+
+    // // if solved for this weight, use best solution
+    // if ()
+    // {
+
+
+    // // 
+    // } else {
+
+    //     // Keep going if the container isn't empty
+    //     // and
+    //     // Keep going if the item at top of container can fit into bag
+    //     while ((!container.empty()) && (container.top().weight < max_weight))
+    //     {
+    //         // choose item i from container
+    //         transfer_from_to(container,loot_bag);
+            
+    //         // subtract i weight from max
+    //         max_weight = max_weight - loot_bag.top().weight;
+            
+    //         // add value i to current value
+    //         current_value = current_value + loot_bag.top().value;
+
+    //         // subprob(n-1)
+    //         optimize(max_weight, current_value, container, loot_bag);
+
+    //     }
+    // }
+
+    // // compare bag to solution w/o item i
+    // if (current_value > )
+
+    // return value;
+}
+
+void readFile (string filename, priority_queue<item>& container, int & num_of_items, int & container_capacity) { 
+
+    ifstream inFile;
+    inFile.open(filename.c_str());
+
+    int name;
+    int weight;
+    int value;
+
+    if (!inFile.fail())
+    {
+
+        inFile >> container_capacity;
+        inFile >> num_of_items;
+
+        item tmp = item();
+
+        while (!inFile.eof())
+        {
+            inFile >> value;
+            inFile >> weight;
+
+            tmp.value = value;
+            tmp.weight = weight;
+
+            container.push(tmp);
+        }
+    }
+
+    inFile.close();
+}
