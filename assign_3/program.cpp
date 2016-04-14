@@ -8,10 +8,6 @@ struct item
 {
     int weight;
     int value;
-    bool operator<(const item& rhs) const
-    {
-        return weight > rhs.weight;
-    }
 };
 
 void insert_item_into(vector<item>& container, int weight, int value);
