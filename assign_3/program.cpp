@@ -1,12 +1,7 @@
 #include <iostream>
-#include <queue>
 #include <string>
 #include <fstream>
-#include <map>
-#include <unordered_map>
 #include <vector>
-#include <fstream>
-#include <string>
 using namespace std;
 
 struct item
@@ -19,7 +14,6 @@ struct item
     }
 };
 
-<<<<<<< HEAD
 void insert_item_into(vector<item>& container, int weight, int value);
 int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items);
 void print_contents_of(vector<item> container);
@@ -70,7 +64,7 @@ void print_item(item x)
     cout << "(W: " << x.weight << ", V: " << x.value << ")" << endl;
 }
 
-void print_contents_of(priority_queue<item> container)
+void print_contents_of(vector<item> container)
 {
     cout << endl << "=====Contents of container=====" << endl;
 
@@ -83,12 +77,12 @@ void print_contents_of(priority_queue<item> container)
     cout << "==============================="<< endl;
 }
 
-void insert_item_into(priority_queue<item>& container, int weight, int value)
+void insert_item_into(vector<item>& container, int weight, int value)
 {
     item tmp = item();
     tmp.weight = weight;
     tmp.value = value;
-    container.push(tmp);
+    container.push_back(tmp);
 }
 
 /*
