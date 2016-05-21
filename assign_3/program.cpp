@@ -101,9 +101,9 @@ void insert_item_into(vector<item>& container, int weight, int value)
 */
 int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items)
 {
-
     int item, weight, value_with_item, value_without_item;
     int optimal_table[num_of_items+1][max_weight+1];
+    int solution_table[num_of_items+1][max_weight+1];
 
     // iterate through items
     for (int item = 0; item <= num_of_items; item++)
@@ -118,6 +118,7 @@ int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items)
             {
                 //cout << "Assigning [" << item << "," << weight << "] : 0" << endl;
                 optimal_table[item][weight] = 0;
+                solution_table[item][weight] = 0;
             }
 
             // if item fits in bag
@@ -127,28 +128,54 @@ int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items)
                 value_with_item = container[item-1].value + optimal_table[item-1][weight - container[item-1].weight];
                 value_without_item = optimal_table[item-1][weight];
 
-                //assign bigger of the two values
                 if (value_with_item > value_without_item)
                 {
                     //cout << "Assigning [" << item << "," << weight << "] : " << value_with_item << " (value including item #" << item-1 << ")" << endl;
-                    optimal_table[item][weight] = value_with_item; 
+                    optimal_table[item][weight] = value_with_item;
+                    solution_table[item][weight] = container[item-1].weight;
                 }
                 else
                 {
                     //cout << "Assigning [" << item << "," << weight << "] : " << value_without_item << " (value excluding item #" << item-1 << ")" << endl;
                     optimal_table[item][weight] = value_without_item;
+                    solution_table[item][weight] = 0;
                 }
 
             }
 
-            // just use previous value
+            // if item doesnt fit in bag, just use previous value
             else
             {
                 //cout << "Assigning [" << item << "," << weight << "] : " << optimal_table[item-1][weight] << " (because item #" << item-1 << " won't fit)" << endl;
                 optimal_table[item][weight] = optimal_table[item-1][weight];
+                solution_table[item][weight] = 0;
             }
         }
     }
+
+
+    // print solution
+    int sol_weight = max_weight;
+    int sol_item = num_of_items;
+    while (sol_weight > 0 && sol_item > 0)
+    {
+        if (solution_table[sol_item][sol_weight] > 0)
+            cout << "Took item " << sol_item << endl;
+
+        sol_weight = sol_weight - solution_table[sol_item][sol_weight];
+        sol_item--;
+    }
+
+    // Check solution array
+    // for (int i=0; i<= num_of_items; i++){
+    //     for (int j=0; j<= max_weight; j++)
+    //     {
+    //         cout << solution_table[i][j] << '\t';
+    //     }
+    //     cout << endl;
+    // }
+
+    cout << endl;
 
     return optimal_table[num_of_items][max_weight];
 
