@@ -10,40 +10,24 @@ struct item
     int value;
 };
 
+const int max_weight = 5;
 void insert_item_into(vector<item>& container, int weight, int value);
 int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items);
 void print_contents_of(vector<item> container);
 void print_item(item);
-void readFile( string filename, 
-               vector<item> & container,
-               int & container_capacity,
-               int & num_of_items
-             );
+
 int main()
 {
+    vector<int> v = {12, 10, 20, 15};
+    vector<int> w = {2, 1, 3, 2};
 
     vector<item> inventory;
-    int max_weight;
-    int num_of_items;
+    int num_of_items = v.size();
 
-    //=============Begin File Read Stuff=====================
-    fstream file;
-    string filename;
-    bool badFile = true;
-
-    do {
-
-        cout << "Input file name: ";
-        cin >> filename;
-        
-        file.open(filename);
-        badFile = file.fail();
-        file.close();
-
-    } while (badFile);
-
-    readFile(filename,inventory,max_weight,num_of_items);
-    //=============End File Read Stuff=======================
+    for (int i = 0; i < v.size(); i++)
+    {
+        insert_item_into(inventory,w[i],v[i]);
+    }
 
     print_contents_of(inventory);
 
@@ -160,17 +144,26 @@ int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items)
     while (sol_weight > 0 && sol_item > 0)
     {
         if (solution_table[sol_item][sol_weight] > 0)
-            cout << "Took item " << sol_item << endl;
+            cout << "Took item " << sol_item - 1 << endl;
 
         sol_weight = sol_weight - solution_table[sol_item][sol_weight];
         sol_item--;
     }
-
-    // Check solution array
-    // for (int i=0; i<= num_of_items; i++){
-    //     for (int j=0; j<= max_weight; j++)
+    
+    // Print optimal value table
+    for (int row=num_of_items; row >= 0; row--){
+        for (int col=0; col <= max_weight; col++)
+        {
+            cout << optimal_table[row][col] << '\t';
+        }
+        cout << endl;
+    }
+    //    cout << " === " << endl;
+    // /* Print item weight table */
+    // for (int row=num_of_items; row >= 0; row--){
+    //     for (int col=0; col <= max_weight; col++)
     //     {
-    //         cout << solution_table[i][j] << '\t';
+    //         cout << solution_table[row][col] << '\t';
     //     }
     //     cout << endl;
     // }
@@ -180,46 +173,3 @@ int optimal_knapsack(vector<item>& container, int max_weight, int num_of_items)
     return optimal_table[num_of_items][max_weight];
 
 }
-
-void readFile(string filename, vector<item>& container, int & container_capacity, int & num_of_items)
-{ 
-    ifstream inFile;
-    inFile.open(filename.c_str());
-
-    int weight;
-    int value;
-
-    if (!inFile.fail())
-    {
-
-        inFile >> container_capacity;
-        inFile >> num_of_items;
-
-        item tmp = item();
-
-        while (!inFile.eof())
-        {
-            inFile >> value;
-            inFile >> weight;
-
-            insert_item_into(container,weight,value);
-        }
-    }
-
-    inFile.close();
-}
-
-//======================Resources=======================
-
-// show problem has 2 properties: pg 424 & 425
-// pg 369 for algorithm
-
-// BOTTOM_UP_CUT_ROD(p,n), where p is price table and n is max size pg 366
-// let r[0...n] be a new array        result array for saving subprobs
-// r[0] = 0
-// for j = 1 to n
-//     q = -inf
-//     for i = 1 to j
-//         q = max(q, p[i] + r[j-i])
-//     r[j] = q
-// return r[n]
